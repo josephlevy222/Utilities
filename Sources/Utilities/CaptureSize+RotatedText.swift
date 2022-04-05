@@ -45,21 +45,21 @@ private struct HeightKey: PreferenceKey {
 
 extension View {
 
-    func captureSize(in binding: Binding<CGSize>) -> some View {
+    public func captureSize(in binding: Binding<CGSize>) -> some View {
         overlay(GeometryReader { proxy in
             Color.clear.preference(key: SizeKey.self, value: proxy.size)
         })
             .onPreferenceChange(SizeKey.self) { size in binding.wrappedValue = size  }
     }
     
-    func captureWidth(in binding: Binding<CGFloat>) -> some View {
+    public func captureWidth(in binding: Binding<CGFloat>) -> some View {
         overlay(GeometryReader { proxy in
             Color.clear.preference(key: WidthKey.self, value: proxy.size.width)
         })
             .onPreferenceChange(WidthKey.self) { width in binding.wrappedValue = width  }
     }
     
-    func captureHeight(in binding: Binding<CGFloat>) -> some View {
+    public func captureHeight(in binding: Binding<CGFloat>) -> some View {
         overlay(GeometryReader { proxy in
             Color.clear.preference(key: HeightKey.self, value: proxy.size.height)
         })
@@ -67,18 +67,18 @@ extension View {
     }
 }
 
-struct Rotated<Rotated: View>: View {
+public struct Rotated<Rotated: View>: View {
     var view: Rotated
     var angle: Angle
 
-    init(_ view: Rotated, angle: Angle = .degrees(-90)) {
+    public init(_ view: Rotated, angle: Angle = .degrees(-90)) {
         self.view = view
         self.angle = angle
     }
 
     @State private var size: CGSize = .zero
 
-    var body: some View {
+    public var body: some View {
         // Rotate the frame, and compute the smallest integral frame that contains it
         let newFrame = CGRect(origin: .zero, size: size)
             .offsetBy(dx: -size.width/2, dy: -size.height/2)
@@ -95,7 +95,7 @@ struct Rotated<Rotated: View>: View {
 }
 
 extension View {
-    func rotated(_ angle: Angle = .degrees(-90)) -> some View {
+    public func rotated(_ angle: Angle = .degrees(-90)) -> some View {
         Rotated(self, angle: angle)
     }
 }

@@ -10,7 +10,7 @@ import SwiftUI
 /// horizontalFill makes a view that fills the Horizontal space using Spacer() on the left and right
 /// @ViewBuilder // this appears to be optional here since only on kind of view is returned
 extension View {
-    func horizontalFill(minLength: CGFloat = 0) -> some View {
+    public func horizontalFill(minLength: CGFloat = 0) -> some View {
         HStack { Spacer(minLength: minLength); self; Spacer(minLength: minLength) } }
 }
 
@@ -35,12 +35,12 @@ extension Menu {
     }
 }*/
     
-struct DropdownMenu: View {
+public struct DropdownMenu: View {
     // Menu does not support Text Attributes in dropdown
     var placeHolder = HTMLParser("<gray>Unselected</gray>").attributedString
     @Binding var selection: Int
     let options: [AttributedString]
-    var body: some View {
+    public var body: some View {
         Menu(content: {
             ForEach(options.indices, id:\.self) { i in
                 Button(action: { selection = i }) {
@@ -60,12 +60,12 @@ struct DropdownMenu: View {
 /// when the Button is pushed and the selection Binding is set to that element
 /// A placeHolder is used for selections that are out of range in option can be set
 //@available(iOS 15, *)
-struct Dropdown: View {
+public struct Dropdown: View {
     var placeHolder = HTMLParser("<gray>Unselected</gray>").attributedString
     @Binding var selection: Int
     let options: [AttributedString]
     @State private var showDropDown = false
-    var body: some View {
+    public var body: some View {
         Button(action:  { showDropDown = true }) {
             Text(options.indices.contains(selection) ?
                  options[selection] :

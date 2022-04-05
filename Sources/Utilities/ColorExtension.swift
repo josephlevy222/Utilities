@@ -17,7 +17,7 @@ import AppKit
 
 extension Color {
     
-    var components: (r: CGFloat, g: CGFloat, b: CGFloat, a: CGFloat) {
+    public var components: (r: CGFloat, g: CGFloat, b: CGFloat, a: CGFloat) {
         
         var r: CGFloat = 0,  g: CGFloat = 0,  b: CGFloat = 0, a: CGFloat = 0
         #if canImport(UIKit)
@@ -32,7 +32,7 @@ extension Color {
         #endif
     }
     
-    var sARGB: Int {
+    public var sARGB: Int {
         // returns Int in hex 0xOORRGGBB where each double letter
         // is 0x00 to 0xFF (0 to 255 in decimal) of the components
         // opacity, red, green, and blue
@@ -48,7 +48,7 @@ extension Color {
         return  ((opacity*256+red)*256+green)*256+blue
     }
     
-    init(sARGB: Int) {
+    public init(sARGB: Int) {
         var s = sARGB
         func next() -> Double { // extract LS 8-bits
             defer { s = s >> 8 } // be ready for next component
