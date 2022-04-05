@@ -11,7 +11,7 @@ import SwiftUI
 
 struct CheckBoxView: View {
     @Binding var checked: Bool
-    public init(checked: Binding<Bool>) {self._checked = checked}
+    public init(checked: Binding<Bool>) {self._checked = checked} 
     var body: some View {
         Image(systemName: checked ? "checkmark.square.fill" : "square")
             .foregroundColor(checked ? Color.accentColor : Color.secondary).frame(width: nil)

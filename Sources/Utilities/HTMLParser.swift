@@ -29,7 +29,7 @@ public typealias Tags = Dictionary<String, (((HTMLParser) -> Void), Bool ) >
 public class HTMLParser {
     //@Environment(\.sizeCategory) var fontSizeCategory // Use to set size of fonts
     /// The result of the parser's work.
-    public init(htmlString: String) { self.htmlString = htmlString }
+    public init(htmlString: String) { self._htmlString = htmlString; parse() }
     private(set) var attributedString = AttributedString("")
     /// HTML-tagged String
     public var attributes = AttributeContainer() // Used by actions in Dictionary
