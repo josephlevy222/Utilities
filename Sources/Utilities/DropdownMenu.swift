@@ -36,6 +36,12 @@ extension Menu {
 }*/
     
 public struct DropdownMenu: View {
+    public init(placeHolder: AttributedString = HTMLParser("<gray>Unselected</gray>").attributedString, selection: Binding<Int>, options: [AttributedString]) {
+        self.placeHolder = placeHolder
+        self._selection = selection
+        self.options = options
+    }
+    
     // Menu does not support Text Attributes in dropdown
     var placeHolder = HTMLParser("<gray>Unselected</gray>").attributedString
     @Binding var selection: Int
