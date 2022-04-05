@@ -9,10 +9,10 @@ import Foundation
 import SwiftUI
 
 
-public struct CheckBoxView: View {
+struct CheckBoxView: View {
     @Binding var checked: Bool
-
-    public var body: some View {
+    public init() {}
+    var body: some View {
         Image(systemName: checked ? "checkmark.square.fill" : "square")
             .foregroundColor(checked ? Color.accentColor : Color.secondary).frame(width: nil)
             .onTapGesture {
