@@ -6,6 +6,14 @@
 //  Based on Rob Napier answer in StackOverFlow
 //  https://stackoverflow.com/questions/58494193/swiftui-rotationeffect-framing-and-offsetting
 //
+
+
+func printSpecial(_ items: Any..., separator: String = ",", terminator: String = "\n") {
+#if SPECIAL
+        print(items,separator: separator,terminator: terminator)
+#endif
+}
+
 import SwiftUI
 
 struct VerticalText: View {
@@ -26,6 +34,7 @@ private struct SizeKey: PreferenceKey {
     static let defaultValue: CGSize = .zero
     static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
         value = nextValue()
+        printSpecial("Value in SizeKey ", value)
     }
 }
 
@@ -33,6 +42,7 @@ private struct WidthKey: PreferenceKey {
     static let defaultValue: CGFloat = 0.0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
+        printSpecial("Value in WidthKey ", value)
     }
 }
 
@@ -40,6 +50,7 @@ private struct HeightKey: PreferenceKey {
     static let defaultValue: CGFloat = 0.0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
+        printSpecial("Value in HeightKey ", value)
     }
 }
 
