@@ -9,7 +9,7 @@
 
 
 func printSpecial(_ items: Any..., separator: String = ",", terminator: String = "\n") {
-#if SPECIAL
+#if DEBUG
         print(items,separator: separator,terminator: terminator)
 #endif
 }
