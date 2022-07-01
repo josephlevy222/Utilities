@@ -67,11 +67,11 @@ public struct DropdownMenu: View {
 /// A placeHolder is used for selections that are out of range in option can be set
 //@available(iOS 15, *)
 public struct Dropdown: View {
-    public init(placeHolder: AttributedString = HTMLParser("<gray>Unselected</gray>").attributedString, selection: Binding<Int>, options: [AttributedString]) {
-        self.placeHolder = placeHolder
-        self._selection = selection
-        self.options = options
-    }
+    //public init(placeHolder: AttributedString = HTMLParser("<gray>Unselected</gray>").attributedString, selection: Binding<Int>, options: [AttributedString]) {
+    //    self.placeHolder = placeHolder
+    //    self._selection = selection
+    //    self.options = options
+    //}
     
     var placeHolder = HTMLParser("<gray>Unselected</gray>").attributedString
     @Binding var selection: Int
