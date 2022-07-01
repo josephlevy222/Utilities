@@ -67,20 +67,22 @@ public struct DropdownMenu: View {
 /// A placeHolder is used for selections that are out of range in option can be set
 //@available(iOS 15, *)
 public struct Dropdown: View {
-    //public init(placeHolder: AttributedString = HTMLParser("<gray>Unselected</gray>").attributedString, selection: Binding<Int>, options: [AttributedString]) {
-    //    self.placeHolder = placeHolder
-    //    self._selection = selection
-    //    self.options = options
-    //}
+
+    
+    public init(placeHolder: AttributedString = HTMLParser("<gray>Unselected</gray>").attributedString, selection: Binding<Int>, options: [AttributedString]) {
+        self.placeHolder = placeHolder
+        self.selection = selection
+        self.options = options
+    }
     
     public var placeHolder = HTMLParser("<gray>Unselected</gray>").attributedString
-    @Binding public var selection: Int
+    public var selection: Binding<Int>
     public let options: [AttributedString]
     @State private var showDropDown = false
     public var body: some View {
         Button(action:  { showDropDown = true }) {
-            Text(options.indices.contains(selection) ?
-                 options[selection] :
+            Text(options.indices.contains(selection.wrappedValue) ?
+                 options[selection.wrappedValue] :
                     placeHolder )//.horizontalFill()
         }
         .popover(isPresented: $showDropDown, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
@@ -90,7 +92,7 @@ public struct Dropdown: View {
                     VStack {
                         Button(action: {
                             showDropDown = false
-                            selection = i
+                            selection.wrappedValue = i
                         }) { Text(options[i]).horizontalFill(minLength: 10) }
                         Divider()
                     }.foregroundColor(.black)
