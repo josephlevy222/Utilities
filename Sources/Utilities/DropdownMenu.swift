@@ -73,9 +73,9 @@ public struct Dropdown: View {
     //    self.options = options
     //}
     
-    var placeHolder = HTMLParser("<gray>Unselected</gray>").attributedString
-    @Binding var selection: Int
-    let options: [AttributedString]
+    public var placeHolder = HTMLParser("<gray>Unselected</gray>").attributedString
+    @Binding public var selection: Int
+    public let options: [AttributedString]
     @State private var showDropDown = false
     public var body: some View {
         Button(action:  { showDropDown = true }) {
