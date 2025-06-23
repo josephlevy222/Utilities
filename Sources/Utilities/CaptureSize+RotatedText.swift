@@ -10,7 +10,7 @@
 
 func printSpecial(_ items: Any..., separator: String = ",", terminator: String = "\n") {
 #if DEBUG
-       // print(items,separator: separator,terminator: terminator)
+      //  print(items,separator: separator,terminator: terminator)
 #endif
 }
 
@@ -51,7 +51,15 @@ private struct HeightKey: PreferenceKey {
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
         printSpecial("Value in HeightKey ", value)
+		
     }
+}
+
+private struct FrameKey: PreferenceKey {
+	static let defaultValue: CGRect = .zero
+	static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+		value = nextValue()
+	}
 }
 
 extension View {
@@ -76,6 +84,13 @@ extension View {
         })
             .onPreferenceChange(HeightKey.self) { height in binding.wrappedValue = height  }
     }
+	
+	public func captureFrame(in binding: Binding<CGRect>) -> some View {
+		overlay(GeometryReader { proxy in
+			Color.clear.preference(key: FrameKey.self, value: proxy.frame(in: .global))
+		})
+		.onPreferenceChange(FrameKey.self) { frame in binding.wrappedValue = frame  }
+	}
 }
 
 public struct Rotated<Rotated: View>: View {
@@ -110,4 +125,6 @@ extension View {
         Rotated(self, angle: angle)
     }
 }
+
+
 

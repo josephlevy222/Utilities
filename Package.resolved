@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "editabletext",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/josephlevy222/EditableText.git",
+      "state" : {
+        "branch" : "test",
+        "revision" : "96bc5794b0af51e340eec1d89e2221a6547c899a"
+      }
+    }
+  ],
+  "version" : 2
+}
