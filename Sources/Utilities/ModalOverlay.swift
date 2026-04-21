@@ -59,8 +59,8 @@ import SwiftUI
 
 /// Shared store for overlay content and dismiss actions. Injected into the environment by modalOverlayRoot().
 /// Written to by ModalOverlayModifier to register/unregister entries.  Read by ModalOverlayRootModifier to render visible overlays.
-//@Observable
-final class ModalOverlayRegistry : ObservableObject {
+//@Observable // iOS 17+
+final class ModalOverlayRegistry : ObservableObject {// no ObservableObject needed for iOS 17+
 	
 	struct Entry {
 		let id: UUID
@@ -71,7 +71,7 @@ final class ModalOverlayRegistry : ObservableObject {
 		let dismissOnTapOutside: Bool
 	}
 	
-	@Published var entries: [UUID: Entry] = [:]
+	@Published var entries: [UUID: Entry] = [:] // no @Published needed for iOS 17+
 	
 	func register(_ entry: Entry) { entries[entry.id] = entry }
 	
@@ -160,8 +160,8 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 					)
 			)
 		// Keep the registry entry in sync
-			.onChange(of: isVisible)   { _ in syncRegistry() }
-			.onChange(of: contentSize) { _ in syncRegistry() }
+			.onChange(of: isVisible)   { _ in syncRegistry() } //no _ in needed for iOS 17+
+			.onChange(of: contentSize) { _ in syncRegistry() } //no _ in needed for iOS 17+
 			.onAppear                  { syncRegistry() }
 			.onDisappear               { registry?.unregister(id) }
 	}
@@ -190,7 +190,7 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 ///   - Renders a single dim/block layer and each overlay content
 ///     at the correct window-level position, above all other views.
 public struct ModalOverlayRootModifier: ViewModifier {
-	@State private var registry = ModalOverlayRegistry()
+	@StateObject private var registry = ModalOverlayRegistry() // was @State in iOS 17+
 	
 	public func body(content: Content) -> some View {
 		content
