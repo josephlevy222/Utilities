@@ -59,8 +59,8 @@ import SwiftUI
 
 /// Shared store for overlay content and dismiss actions. Injected into the environment by modalOverlayRoot().
 /// Written to by ModalOverlayModifier to register/unregister entries.  Read by ModalOverlayRootModifier to render visible overlays.
-@Observable
-final class ModalOverlayRegistry {
+//@Observable
+final class ModalOverlayRegistry : ObservableObject {
 	
 	struct Entry {
 		let id: UUID
@@ -71,11 +71,11 @@ final class ModalOverlayRegistry {
 		let dismissOnTapOutside: Bool
 	}
 	
-	var entries: [UUID: Entry] = [:]
+	@Published var entries: [UUID: Entry] = [:]
 	
 	func register(_ entry: Entry) { entries[entry.id] = entry }
 	
-	func unregister(_ id: UUID) { 	entries.removeValue(forKey: id) }
+	func unregister(_ id: UUID) { entries.removeValue(forKey: id) }
 }
 
 // MARK: - Environment Key
@@ -153,15 +153,15 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 								.onAppear {
 									contentSize = geo.size
 								}
-								.onChange(of: geo.size) { _, newSize in
+								.onChange(of: geo.size) { newSize in
 									contentSize = newSize
 								}
 						}
 					)
 			)
 		// Keep the registry entry in sync
-			.onChange(of: isVisible)   { _, _ in syncRegistry() }
-			.onChange(of: contentSize) { _, _ in syncRegistry() }
+			.onChange(of: isVisible)   { _ in syncRegistry() }
+			.onChange(of: contentSize) { _ in syncRegistry() }
 			.onAppear                  { syncRegistry() }
 			.onDisappear               { registry?.unregister(id) }
 	}
