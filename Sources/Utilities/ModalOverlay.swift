@@ -130,7 +130,14 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 	@State private var id = UUID()          // stable per-modifier identity
 	@State private var contentSize: CGSize = .zero
 	
+	private class ContentContainer {
+		var make: () -> AnyView = { AnyView(EmptyView()) }
+	}
+	
+	@State private var contentContainer = ContentContainer()
+	
 	func body(content: Content) -> some View {
+		let _ = { contentContainer.make = { AnyView(overlayContent()) } }()
 		content
 		// Publish this overlay's anchor and measured size upward
 			.anchorPreference(key: ModalPositionKey.self, value: .bounds) { anchor in
@@ -171,7 +178,7 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 		if isVisible {
 			registry.register(.init(
 				id: id,
-				content: { AnyView(overlayContent()) },
+				content: { self.contentContainer.make() },
 				dismiss: { isVisible = false },
 				dimBackground: dimBackground,
 				blockHits: blockHits,
