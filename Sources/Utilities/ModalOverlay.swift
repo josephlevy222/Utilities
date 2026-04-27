@@ -19,20 +19,19 @@
 //  - ModalOverlayRootModifier — Attaches once at the root. Reads both
 //                               the registry and the positions, renders
 //                               all visible overlays above everything.
-//
 //  Usage:
 //
-//    // 1. Attach root once — at the App level or top-level NavigationStack:
+//    1. Attach root once — at the App level or top-level NavigationStack:
 //    ContentView()
 //        .modalOverlayRoot()
 //
-//    // 2. Attach overlays to any view at any nesting depth:
+//    2. Attach overlays to any view at any nesting depth:
 //    SomeField()
 //        .modalOverlay(isVisible: $isVisible) {
 //            ErrorBubble(message: "Something went wrong")
 //        }
 //
-//    // 3. Multiple overlays on the same view are supported:
+//    3. Multiple overlays on the same view are supported:
 //    SomeField()
 //        .modalOverlay(isVisible: $showError, dismissOnTapOutside: false) {
 //            ErrorBubble(message: errorMessage)
@@ -41,13 +40,13 @@
 //            DropdownMenu(items: items, onSelect: handleSelect)
 //        }
 //
-//    // 4. Multiple views each with their own overlays are supported:
+//     4. Multiple views each with their own overlays are supported:
 //    VStack {
 //        FieldA().modalOverlay(isVisible: $aVisible) { BubbleA() }
 //        FieldB().modalOverlay(isVisible: $bVisible) { BubbleB() }
 //    }
 //
-//    // 5. Sheets need their own root since they have a separate view hierarchy:
+//     5. Sheets need their own root since they have a separate view hierarchy:
 //    .sheet(isPresented: $showSheet) {
 //        SheetContent()
 //            .modalOverlayRoot()
@@ -59,7 +58,6 @@ import SwiftUI
 
 /// Shared store for overlay content and dismiss actions. Injected into the environment by modalOverlayRoot().
 /// Written to by ModalOverlayModifier to register/unregister entries.  Read by ModalOverlayRootModifier to render visible overlays.
-//@Observable // iOS 17+
 final class ModalOverlayRegistry : ObservableObject {// no ObservableObject needed for iOS 17+
 	
 	struct Entry {
@@ -93,8 +91,7 @@ extension EnvironmentValues {
 
 // MARK: - Position Preference
 
-/// One entry per visible overlay, carrying its anchor and measured content size.
-/// PreferenceKey.reduce appends so all overlays in the hierarchy are collected.
+/// One entry per visible overlay, carrying its anchor and measured content size. PreferenceKey.reduce appends so all overlays in the hierarchy are collected.
 struct ModalPositionPreference {
 	let id: UUID
 	let anchor: Anchor<CGRect>  // resolved by the root's GeometryProxy
@@ -104,10 +101,7 @@ struct ModalPositionPreference {
 
 struct ModalPositionKey: PreferenceKey {
 	static var defaultValue: [ModalPositionPreference] = []
-	static func reduce(
-		value: inout [ModalPositionPreference],
-		nextValue: () -> [ModalPositionPreference]
-	) {
+	static func reduce( value: inout [ModalPositionPreference], nextValue: () -> [ModalPositionPreference] ) {
 		value.append(contentsOf: nextValue())
 	}
 }
@@ -129,17 +123,15 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 	@Environment(\.modalOverlayRegistry) private var registry
 	@State private var id = UUID()          // stable per-modifier identity
 	@State private var contentSize: CGSize = .zero
+	@State private var contentContainer = ContentContainer()
 	
 	private class ContentContainer {
 		var make: () -> AnyView = { AnyView(EmptyView()) }
 	}
 	
-	@State private var contentContainer = ContentContainer()
-	
 	func body(content: Content) -> some View {
 		let _ = { contentContainer.make = { AnyView(overlayContent()) } }()
-		content
-		// Publish this overlay's anchor and measured size upward
+		content // Publish this overlay's anchor and measured size upward
 			.anchorPreference(key: ModalPositionKey.self, value: .bounds) { anchor in
 				guard isVisible else { return [] }
 				return [ModalPositionPreference(
@@ -149,7 +141,7 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 					isVisible: contentSize != .zero // if true render else wait
 				)]
 			}
-		// Measure the overlay content without displaying it
+			// Measure the overlay content without displaying it
 			.background(
 				overlayContent()
 					.fixedSize()
@@ -166,7 +158,7 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 						}
 					)
 			)
-		// Keep the registry entry in sync
+			// Keep the registry entry in sync
 			.onChange(of: isVisible)   { _ in syncRegistry() } //no _ in needed for iOS 17+
 			.onChange(of: contentSize) { _ in syncRegistry() } //no _ in needed for iOS 17+
 			.onAppear                  { syncRegistry() }
@@ -194,8 +186,7 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 /// Responsibilities:
 ///   - Creates and injects the shared ModalOverlayRegistry.
 ///   - Collects all overlay positions via overlayPreferenceValue.
-///   - Renders a single dim/block layer and each overlay content
-///     at the correct window-level position, above all other views.
+///   - Renders a single dim/block layer and each overlay content at the correct window-level position, above all other views.
 public struct ModalOverlayRootModifier: ViewModifier {
 	@StateObject private var registry = ModalOverlayRegistry() // was @State in iOS 17+
 	
@@ -203,7 +194,6 @@ public struct ModalOverlayRootModifier: ViewModifier {
 		content
 			.environment(\.modalOverlayRegistry, registry)
 			.overlayPreferenceValue(ModalPositionKey.self) { prefs in
-				
 				// Entries that are visible and have registered content
 				let visible = prefs.filter {
 					$0.isVisible && registry.entries[$0.id] != nil
@@ -212,18 +202,19 @@ public struct ModalOverlayRootModifier: ViewModifier {
 				if !visible.isEmpty {
 					GeometryReader { geo in
 						let windowWidth = geo.size.width
-						
 						// One dim/block layer covering all active overlays. Driven by whether ANY visible entry requests it.
 						let shouldDim   = visible.contains { registry.entries[$0.id]?.dimBackground == true }
 						let shouldBlock = visible.contains { registry.entries[$0.id]?.blockHits     == true }
+						let shouldDismiss = visible.contains { registry.entries[$0.id]?.dismissOnTapOutside == true }
 						
-						if shouldDim || shouldBlock {
+						// Always render this layer if any of the three flags are active
+						if shouldDim || shouldBlock || shouldDismiss {
 							Color.black
 								.opacity(shouldDim ? 0.2 : 0)
 								.ignoresSafeArea()
-								//.contentShape(shouldBlock ? Rectangle() : Path()) // No good SwiftUI
-								.onTapGesture {
-									// Dismiss every overlay that permits tap-outside dismissal
+								.contentShape(Rectangle())  // ensures transparent layer still receives taps
+								.allowsHitTesting(shouldBlock || shouldDismiss)
+								.onTapGesture { // Dismiss every overlay that permits tap-outside dismissal
 									visible.forEach { pref in
 										if let entry = registry.entries[pref.id],
 										   entry.dismissOnTapOutside {
@@ -254,10 +245,7 @@ public struct ModalOverlayRootModifier: ViewModifier {
 								
 								entry.content()
 									.frame(width: size.width, height: size.height) /// Constrain rendered content size
-									.position(
-										x: clampedX + size.width  / 2,
-										y: yPos     + size.height / 2
-									)
+									.position(x: clampedX + size.width / 2, y: yPos     + size.height / 2)
 									.transition(
 										.opacity.combined(
 											with: .scale(scale: 0.95, anchor: .top)
@@ -278,7 +266,6 @@ public struct ModalOverlayRootModifier: ViewModifier {
 // MARK: - View Extensions
 
 extension View {
-	
 	/// Attach an overlay to this view.
 	/// Renders at root level — unaffected by ancestor clipping (ScrollView, List, etc).
 	///
@@ -299,18 +286,14 @@ extension View {
 	) -> some View {
 		modifier(ModalOverlayModifier(
 			isVisible: isVisible,
-			dimBackground: dimBackground,
-			blockHits: blockHits,
-			dismissOnTapOutside: dismissOnTapOutside,
+			dimBackground: dimBackground, blockHits: blockHits, dismissOnTapOutside: dismissOnTapOutside,
 			overlayContent: content
 		))
 	}
 	
-	/// Attach once at the root of a view hierarchy to enable all
-	/// modalOverlay modifiers below it.
+	/// Attach once at the root of a view hierarchy to enable all modalOverlay modifiers below it.
 	///
-	/// Sheets and fullScreenCovers have separate view hierarchies
-	/// and each need their own `.modalOverlayRoot()`.
+	/// Sheets and fullScreenCovers have separate view hierarchies  and each need their own `.modalOverlayRoot()`.
 	public func modalOverlayRoot() -> some View { modifier(ModalOverlayRootModifier()) }
 }
 
@@ -342,14 +325,8 @@ public struct ErrorBubble: View {
 
 extension View {
 	public func errorOverlay(_ message: String?) -> some View {
-		modalOverlay(
-			isVisible: Binding(
-				get: { message != nil },
-				set: { _ in }
-			),
-			dimBackground: false,
-			blockHits: false,
-			dismissOnTapOutside: false
+		modalOverlay( isVisible: Binding( get: { message != nil }, set: { _ in } ),
+			dimBackground: false, blockHits: false, dismissOnTapOutside: false
 		) {
 			ErrorBubble(message: message ?? "")
 		}
