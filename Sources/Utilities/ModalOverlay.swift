@@ -64,7 +64,7 @@ final class ModalOverlayRegistry : ObservableObject {// no ObservableObject need
 	
 	struct Entry {
 		let id: UUID
-		let content: AnyView
+		let content: () -> AnyView
 		let dismiss: () -> Void
 		let dimBackground: Bool
 		let blockHits: Bool
@@ -171,7 +171,7 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 		if isVisible {
 			registry.register(.init(
 				id: id,
-				content: AnyView(overlayContent()),
+				content: { AnyView(overlayContent()) },
 				dismiss: { isVisible = false },
 				dimBackground: dimBackground,
 				blockHits: blockHits,
@@ -245,7 +245,7 @@ public struct ModalOverlayRootModifier: ViewModifier {
 								? frame.minY - size.height - gap
 								: frame.maxY + gap
 								
-								entry.content
+								entry.content()
 									.frame(width: size.width, height: size.height) /// Constrain rendered content size
 									.position(
 										x: clampedX + size.width  / 2,
