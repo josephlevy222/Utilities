@@ -82,49 +82,49 @@ public struct DropdownMenu: View {
     }
 }
 
-// Menu does not support Text Attributes in dropdown
-public struct DropdownMenuAttributedText: View {
-	public init(placeHolder: String = "Unselected", selection: Binding<Int>, options: [AttributedString]) {
-		self.placeHolder = placeHolder
-		self._selection = selection
-		self.options = options
-		self.optionImages = options.map { option in
-			Image(uiImage: Text(option).foregroundStyle(.black).snapshot())}
-	}
-	
-	// Menu does not support Text Attributes in dropdown
-	var placeHolder = "Unselected"
-	@Binding var selection: Int
-	@State var showMenu = false
-	let options: [AttributedString]
-	let optionImages: [Image]
-	public var body: some View {
-		Menu {
-			ForEach(options.indices, id:\.self) { i in
-				Button { selection = i } label: {
-					Text(options[i])}
-			}
-		} label: {
-			(options.indices.contains(selection)
-			 ? Text(options[selection])
-			 : Text(placeHolder).foregroundColor(.gray))
-		}.menuStyle(DropdownMenuStyle())//.buttonStyle(.plain)
-	}
-}
+//// Menu does not support Text Attributes in dropdown
+//public struct DropdownMenuAttributedText: View {
+//	public init(placeHolder: String = "Unselected", selection: Binding<Int>, options: [AttributedString]) {
+//		self.placeHolder = placeHolder
+//		self._selection = selection
+//		self.options = options
+//		self.optionImages = options.map { option in
+//			Image(uiImage: Text(option).foregroundStyle(.black).snapshot())}
+//	}
+//	
+//	// Menu does not support Text Attributes in dropdown
+//	var placeHolder = "Unselected"
+//	@Binding var selection: Int
+//	@State var showMenu = false
+//	let options: [AttributedString]
+//	let optionImages: [Image]
+//	public var body: some View {
+//		Menu {
+//			ForEach(options.indices, id:\.self) { i in
+//				Button { selection = i } label: {
+//					Text(options[i])}
+//			}
+//		} label: {
+//			(options.indices.contains(selection)
+//			 ? Text(options[selection])
+//			 : Text(placeHolder).foregroundColor(.gray))
+//		}.menuStyle(DropdownMenuStyle())//.buttonStyle(.plain)
+//	}
+//}
 
- extension View {
-	func snapshot() -> UIImage {
-		let controller = UIHostingController(rootView: self.edgesIgnoringSafeArea(.all))
-		/// Note: The.edgesIgnoringSafeArea(.all) is needed too avoid clipping
-		let targetSize = controller.view.intrinsicContentSize
-		controller.view.bounds = CGRect(origin: .zero, size: targetSize)
-		controller.view.backgroundColor = .clear
-		let renderer = UIGraphicsImageRenderer(size: targetSize)
-		return renderer.image { _ in
-			controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
-		}
-	}
-}
+// extension View {
+//	func snapshot() -> UIImage {
+//		let controller = UIHostingController(rootView: self.edgesIgnoringSafeArea(.all))
+//		/// Note: The.edgesIgnoringSafeArea(.all) is needed too avoid clipping
+//		let targetSize = controller.view.intrinsicContentSize
+//		controller.view.bounds = CGRect(origin: .zero, size: targetSize)
+//		controller.view.backgroundColor = .clear
+//		let renderer = UIGraphicsImageRenderer(size: targetSize)
+//		return renderer.image { _ in
+//			controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+//		}
+//	}
+//}
 
 struct MenuList : View {
 	var texts: [AttributedString]
@@ -150,44 +150,122 @@ struct MenuList : View {
 /// The options array has the AttributedStrings that are chosen from the popover displayed
 /// when the Button is pushed and the selection Binding is set to that element
 /// A placeHolder is used for selections that are out of range in option can be set
-public struct Dropdown: View {
+//public struct Dropdown: View {
+//
+//    public init(placeHolder: AttributedString = HTMLParser("<gray>Unselected</gray>").attributedString, selection: Binding<Int>, options: [AttributedString]) {
+//        self.placeHolder = placeHolder
+//        self._selection = selection
+//        self.options = options
+//    }
+//    
+//    public var placeHolder = HTMLParser("<gray>Unselected</gray>").attributedString
+//    @Binding public var selection: Int
+//    public let options: [AttributedString]
+//    @State private var showDropDown = false
+//    public var body: some View {
+//        Button(action:  { showDropDown = true }) {
+//            Text(options.indices.contains(selection) ?
+//                 options[selection] :
+//                    placeHolder )//.horizontalFill()
+//        }
+//        .popover(isPresented: $showDropDown, attachmentAnchor: .rect(.bounds), arrowEdge: .top) {
+//            VStack {
+//                Spacer()
+//                ForEach(options.indices, id:\.self) { i in
+//                    VStack {
+//                        Button(action: {
+//                            showDropDown = false
+//                            selection = i
+//                        }) { Text(options[i]).horizontalFill(minLength: 10) }
+//                        Divider()
+//                    }.foregroundColor(.black)
+//                }
+//            }
+//            .textFieldStyle(.automatic)
+//            .buttonStyle(.plain)
+//            //.background(Color.white)
+//        }
+//    }
+//}
 
-    public init(placeHolder: AttributedString = HTMLParser("<gray>Unselected</gray>").attributedString, selection: Binding<Int>, options: [AttributedString]) {
-        self.placeHolder = placeHolder
-        self._selection = selection
-        self.options = options
-    }
-    
-    public var placeHolder = HTMLParser("<gray>Unselected</gray>").attributedString
-    @Binding public var selection: Int
-    public let options: [AttributedString]
-    @State private var showDropDown = false
-    public var body: some View {
-        Button(action:  { showDropDown = true }) {
-            Text(options.indices.contains(selection) ?
-                 options[selection] :
-                    placeHolder )//.horizontalFill()
-        }
-        .popover(isPresented: $showDropDown, attachmentAnchor: .rect(.bounds), arrowEdge: .top) {
-            VStack {
-                Spacer()
-                ForEach(options.indices, id:\.self) { i in
-                    VStack {
-                        Button(action: {
-                            showDropDown = false
-                            selection = i
-                        }) { Text(options[i]).horizontalFill(minLength: 10) }
-                        Divider()
-                    }.foregroundColor(.black)
-                }
-            }
-            .textFieldStyle(.automatic)
-            .buttonStyle(.plain)
-            //.background(Color.white)
-        }
-    }
+public struct Dropdown: View {
+	
+	public init(
+		placeHolder: AttributedString = HTMLParser("<gray>Unselected</gray>").attributedString,
+		selection: Binding<Int>,
+		options: [AttributedString]
+	) {
+		self.placeHolder = placeHolder
+		self._selection = selection
+		self.options = options
+	}
+	
+	public var placeHolder: AttributedString
+	@Binding public var selection: Int
+	public let options: [AttributedString]
+	@State private var showDropDown = false
+	
+	public var body: some View {
+		Button { showDropDown = true } label: {
+			Text(options.indices.contains(selection) ? options[selection] : placeHolder)
+		}
+		.modalOverlay(
+			isVisible: $showDropDown,
+			dimBackground: false,
+			blockHits: false,
+			dismissOnTapOutside: true
+		) {
+			DropdownPanel(options: options, selection: $selection)
+		}
+	}
+	
+	private struct DropdownPanel: View {
+		@Environment(\.dismissModalOverlay) private var dismiss
+		let options: [AttributedString]
+		@Binding var selection: Int
+		
+		var body: some View {
+			VStack(spacing: 0) {
+				ForEach(options.indices, id: \.self) { i in
+					Button {
+						selection = i
+						dismiss?()
+					} label: {
+						Text(options[i])
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.padding(.horizontal, 12)
+							.padding(.vertical, 6)
+					}
+					.buttonStyle(MenuItemButtonStyle())
+					if i < options.indices.last! {
+						Divider()
+					}
+				}
+			}
+			.background(.regularMaterial)
+			.clipShape(RoundedRectangle(cornerRadius: 10))
+			.shadow(radius: 8)
+			.frame(minWidth: 150)
+		}
+	}
 }
 
+struct MenuItemButtonStyle: ButtonStyle {
+	@State private var isHovered = false
+	
+	func makeBody(configuration: Configuration) -> some View {
+		configuration.label
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.padding(.horizontal, 12)
+			.padding(.vertical, 6)
+			.background(
+				RoundedRectangle(cornerRadius: 6)
+					.fill(configuration.isPressed || isHovered ? Color.accentColor : Color.clear)
+			)
+			.foregroundStyle(configuration.isPressed || isHovered ? Color.white : Color.primary)
+			.onHover { isHovered = $0 }
+	}
+}
 
 //#Preview {
 	struct Preview: View {
