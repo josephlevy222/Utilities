@@ -44,7 +44,7 @@
 ///        SheetContent()
 ///            .modalOverlayRoot()
 ///    }
-/// 6. dismissOnTapOutside Dismiss Behaviour — Hit Testing Boundaries & Environment
+/// 6. dismissOnTapOutside Dismiss Behavior — Hit Testing Boundaries & Environment
 ///    Whether buttons inside an overlay auto-dismiss, and whether dismissModalOverlay is accessible, depends on how the overlay content is structured:
 ///
 ///    a) Inline content (@ViewBuilder var or closure) — content is evaluated in the PARENT view's context, outside the overlay's environment subtree. This means:
@@ -82,7 +82,7 @@
 ///     SomeView().modalOverlay(isVisible: $show) { MyPanel() }
 ///
 //  The struct approach (b) is strongly recommended for any panel that needs dismiss control — environment injection makes
-//  intent explicit and dismiss behaviour is consistent across all control types.  The inline approach (a) is fine for simple
+//  intent explicit and dismiss behavior is consistent across all control types.  The inline approach (a) is fine for simple
 //  non-dismissing overlays like ErrorBubble where no dismiss control is needed at all. Toggles and Sliders consume their own
 //  taps so they never propagate — they do NOT dismiss on their own. To make one dismiss, use @DismissingState
 //  or call dismiss explicitly via onChange:
@@ -375,11 +375,11 @@ extension View {
 	///   - dismissOnTapOutside: Tapping outside sets isVisible to false. Default `true`.
 	///   - content:             The view to display as the overlay.
 	///
-	/// Dismissal behaviour of content elements:
-	///   - Buttons propagate taps to the background layer → dismiss automatically.
-	///   - Toggles/Sliders consume taps → do NOT dismiss automatically.
-	///     Use @DismissingState or @Environment(\.dismissModalOverlay) + onChange to opt in.
-	///   - To prevent a button from dismissing, apply .noModalDismiss().
+	/// Dismissal behavior of content elements:
+	///   - Buttons propagate taps to the background layer → dismiss automatically if in the modalOverlay directly not in a view struct in the overlay.
+	///   - Toggles/Sliders consume taps → do NOT dismiss automatically, ever.
+	///     Use @DismissingState or @Environment(\.dismissModalOverlay) + onChange to opt in on tap consuming views.
+	///   - To prevent a button from dismissing, apply .noModalDismiss() or use in a view struct (with its own hit testing.)
 	public func modalOverlay<Content: View>(
 		isVisible: Binding<Bool>,
 		dimBackground: Bool = true,
