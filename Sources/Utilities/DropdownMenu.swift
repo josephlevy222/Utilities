@@ -146,47 +146,47 @@ struct MenuList : View {
 	}
 }
 
-/// This is a Button with a Text label using a AttributedString and HTMLParser styling
-/// The options array has the AttributedStrings that are chosen from the popover displayed
-/// when the Button is pushed and the selection Binding is set to that element
-/// A placeHolder is used for selections that are out of range in option can be set
-//public struct Dropdown: View {
-//
-//    public init(placeHolder: AttributedString = HTMLParser("<gray>Unselected</gray>").attributedString, selection: Binding<Int>, options: [AttributedString]) {
-//        self.placeHolder = placeHolder
-//        self._selection = selection
-//        self.options = options
-//    }
-//    
-//    public var placeHolder = HTMLParser("<gray>Unselected</gray>").attributedString
-//    @Binding public var selection: Int
-//    public let options: [AttributedString]
-//    @State private var showDropDown = false
-//    public var body: some View {
-//        Button(action:  { showDropDown = true }) {
-//            Text(options.indices.contains(selection) ?
-//                 options[selection] :
-//                    placeHolder )//.horizontalFill()
-//        }
-//        .popover(isPresented: $showDropDown, attachmentAnchor: .rect(.bounds), arrowEdge: .top) {
-//            VStack {
-//                Spacer()
-//                ForEach(options.indices, id:\.self) { i in
-//                    VStack {
-//                        Button(action: {
-//                            showDropDown = false
-//                            selection = i
-//                        }) { Text(options[i]).horizontalFill(minLength: 10) }
-//                        Divider()
-//                    }.foregroundColor(.black)
-//                }
-//            }
-//            .textFieldStyle(.automatic)
-//            .buttonStyle(.plain)
-//            //.background(Color.white)
-//        }
-//    }
-//}
+// This is a Button with a Text label using a AttributedString and HTMLParser styling
+// The options array has the AttributedStrings that are chosen from the popover displayed
+// when the Button is pushed and the selection Binding is set to that element
+// A placeHolder is used for selections that are out of range in option can be set
+public struct DropdownPopover: View {
+
+    public init(placeHolder: AttributedString = HTMLParser("<gray>Unselected</gray>").attributedString, selection: Binding<Int>, options: [AttributedString]) {
+        self.placeHolder = placeHolder
+        self._selection = selection
+        self.options = options
+    }
+    
+    public var placeHolder = HTMLParser("<gray>Unselected</gray>").attributedString
+    @Binding public var selection: Int
+    public let options: [AttributedString]
+    @State private var showDropDown = false
+    public var body: some View {
+        Button(action:  { showDropDown = true }) {
+            Text(options.indices.contains(selection) ?
+                 options[selection] :
+                    placeHolder )//.horizontalFill()
+        }
+        .popover(isPresented: $showDropDown, attachmentAnchor: .rect(.bounds), arrowEdge: .top) {
+            VStack {
+                Spacer()
+                ForEach(options.indices, id:\.self) { i in
+                    VStack {
+                        Button(action: {
+                            showDropDown = false
+                            selection = i
+                        }) { Text(options[i]).horizontalFill(minLength: 10) }
+                        Divider()
+                    }.foregroundColor(.black)
+                }
+            }
+            .textFieldStyle(.automatic)
+            .buttonStyle(.plain)
+            //.background(Color.white)
+        }
+    }
+}
 
 public struct Dropdown: View {
 	
