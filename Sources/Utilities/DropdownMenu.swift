@@ -232,10 +232,10 @@ public struct Dropdown: View {
 						selection = i
 						dismiss?()
 					} label: {
-						Text(options[i])
-							.frame(maxWidth: .infinity, alignment: .leading)
-							.padding(.horizontal, 12)
-							.padding(.vertical, 6)
+						Text(options[i]).horizontalFill(minLength: 10)
+							//.frame(maxWidth: .infinity, alignment: .leading)
+							//.padding(.horizontal, 12)
+							//.padding(.vertical, 6)
 					}
 					.buttonStyle(MenuItemButtonStyle())
 					if i < options.indices.last! {
