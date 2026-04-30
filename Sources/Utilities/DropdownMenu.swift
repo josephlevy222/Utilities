@@ -213,7 +213,8 @@ public struct Dropdown: View {
 			isVisible: $showDropDown,
 			dimBackground: false,
 			blockHits: false,
-			dismissOnTapOutside: true
+			dismissOnTapOutside: true,
+			prefersDown: true
 		) {
 			DropdownPanel(options: options, selection: $selection)
 		}

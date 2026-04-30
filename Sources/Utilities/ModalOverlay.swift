@@ -106,6 +106,7 @@ final class ModalOverlayRegistry: ObservableObject { // no ObservableObject need
 		let dimBackground: Bool
 		let blockHits: Bool
 		let dismissOnTapOutside: Bool
+		let prefersDown: Bool
 	}
 	
 	@Published var entries: [UUID: Entry] = [:] // no @Published needed for iOS 17+
@@ -193,6 +194,7 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 	let dimBackground: Bool
 	let blockHits: Bool
 	let dismissOnTapOutside: Bool
+	let prefersDown: Bool
 	@ViewBuilder let overlayContent: () -> OverlayContent
 	
 	@Environment(\.modalOverlayRegistry) private var registry
@@ -254,7 +256,8 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 				dismiss: { isVisible = false },
 				dimBackground: dimBackground,
 				blockHits: blockHits,
-				dismissOnTapOutside: dismissOnTapOutside
+				dismissOnTapOutside: dismissOnTapOutside,
+				prefersDown: prefersDown
 			))
 		} else {
 			registry.unregister(id)
@@ -323,8 +326,13 @@ public struct ModalOverlayRootModifier: ViewModifier {
 								let size  = pref.contentSize
 								let gap: CGFloat = 6
 								
+								let prefersDown = entry.prefersDown
+								let fitsBelow = frame.maxY + size.height + gap < geo.size.height
+								let fitsAbove = frame.minY - size.height - gap > 0
 								// Flip above/below depending on available space
-								let showAbove = frame.minY - size.height - gap > 0
+								let showAbove = prefersDown
+								? !fitsBelow && fitsAbove  // only go above if it doesn't fit below
+								: fitsAbove                // original behaviour — prefer above
 								
 								// Clamp X so content never bleeds off screen edges
 								let clampedX = min(
@@ -385,6 +393,7 @@ extension View {
 		dimBackground: Bool = true,
 		blockHits: Bool = true,
 		dismissOnTapOutside: Bool = true,
+		prefersDown: Bool = false,
 		@ViewBuilder content: @escaping () -> Content
 	) -> some View {
 		modifier(ModalOverlayModifier(
@@ -392,6 +401,7 @@ extension View {
 			dimBackground: dimBackground,
 			blockHits: blockHits,
 			dismissOnTapOutside: dismissOnTapOutside,
+			prefersDown: prefersDown,
 			overlayContent: content
 		))
 	}
