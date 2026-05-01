@@ -91,14 +91,13 @@ import SwiftUI
 // MARK: - Registry
 
 /// Shared store for overlay content closures and dismiss actions.  Injected into the environment by `modalOverlayRoot()`.
-/// Written to by ModalOverlayModifier to register/unregister entries.
-/// Read by ModalOverlayRootModifier to render visible overlays.
+/// Written to by ModalOverlayModifier to register/unregister entries.  Read by ModalOverlayRootModifier to render visible overlays.
 ///
 /// Content is stored as `() -> AnyView` rather than `AnyView` so that each render pass calls the closure fresh, picking up any state changes
 /// (e.g. a Slider value) without needing to re-register the entry.
 //@Observable // iOS 17+ but not available for 15.6
 final class ModalOverlayRegistry: ObservableObject { // no ObservableObject needed for iOS 17+
-	
+
 	struct Entry {
 		let id: UUID
 		let content: () -> AnyView  // closure — called fresh on every render pass
@@ -112,7 +111,6 @@ final class ModalOverlayRegistry: ObservableObject { // no ObservableObject need
 	@Published var entries: [UUID: Entry] = [:] // no @Published needed for iOS 17+
 	
 	func register(_ entry: Entry) { entries[entry.id] = entry }
-	
 	func unregister(_ id: UUID) { entries.removeValue(forKey: id) }
 }
 
@@ -203,9 +201,7 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 	
 	/// Reference type so the registry's closure always calls through to the
 	/// latest overlayContent() without needing to re-register on every render.
-	private class ContentRef {
-		var make: () -> AnyView = { AnyView(EmptyView()) }
-	}
+	private class ContentRef { var make: () -> AnyView = { AnyView(EmptyView()) } }
 	@State private var contentRef = ContentRef()
 	
 	func body(content: Content) -> some View {
@@ -213,7 +209,7 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 		let _ = { contentRef.make = { AnyView(overlayContent()) } }()
 		
 		return content
-		// Publish this overlay's anchor and measured size upward
+		    // Publish this overlay's anchor and measured size upward
 			.anchorPreference(key: ModalPositionKey.self, value: .bounds) { anchor in
 				guard isVisible else { return [] }
 				return [ModalPositionPreference(
@@ -223,7 +219,7 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 					isVisible: contentSize != .zero // wait until measured before rendering
 				)]
 			}
-		// Measure the overlay content without displaying it
+		    // Measure the overlay content without displaying it
 			.background(
 				overlayContent()
 					.fixedSize()
@@ -231,16 +227,14 @@ struct ModalOverlayModifier<OverlayContent: View>: ViewModifier {
 					.background(
 						GeometryReader { geo in
 							Color.clear
-								.onAppear {
-									contentSize = geo.size
-								}
+								.onAppear { contentSize = geo.size }
 								.onChange(of: geo.size) { newSize in  // no old/new params needed for iOS 17+
 									contentSize = newSize
 								}
 						}
 					)
 			)
-		// Keep the registry entry in sync
+			// Keep the registry entry in sync
 			.onChange(of: isVisible)   { _ in syncRegistry() } // no _ in needed for iOS 17+
 			.onChange(of: contentSize) { _ in syncRegistry() } // no _ in needed for iOS 17+
 			.onAppear                  { syncRegistry() }
@@ -286,11 +280,8 @@ public struct ModalOverlayRootModifier: ViewModifier {
 		content
 			.environment(\.modalOverlayRegistry, registry)
 			.overlayPreferenceValue(ModalPositionKey.self) { prefs in
-				
 				// Entries that are visible and have registered content
-				let visible = prefs.filter {
-					$0.isVisible && registry.entries[$0.id] != nil
-				}
+				let visible = prefs.filter { $0.isVisible && registry.entries[$0.id] != nil }
 				
 				if !visible.isEmpty {
 					GeometryReader { geo in
@@ -370,7 +361,6 @@ public struct ModalOverlayRootModifier: ViewModifier {
 // MARK: - View Extensions
 
 extension View {
-	
 	/// Attach an overlay to this view.
 	/// Renders at root level — unaffected by ancestor clipping (ScrollView, List, etc).
 	///
