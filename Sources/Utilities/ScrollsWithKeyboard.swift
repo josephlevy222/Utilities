@@ -82,18 +82,9 @@ public struct ScrollsWithKeyboard<Content: View>: View {
 	public var body: some View {
 		ZStack {
 			/// Stable height reference that ignores the keyboard so content never collapses when the keyboard appears.
-			GeometryReader { geo in
-				Color.clear
-					.onAppear { baseHeight = geo.size.height }
-					.onChange(of: geo.size) { newSize in
-						DispatchQueue.main.async {
-							if baseHeight != newSize.height {
-								baseHeight = newSize.height
-							}
-						}
-					}
-			}
-			.ignoresSafeArea(.keyboard)
+			Color.clear
+				.ignoresSafeArea(.keyboard)
+				.captureHeight(in: $baseHeight)
 			
 			ScrollViewReader { proxy in
 					ScrollView {
