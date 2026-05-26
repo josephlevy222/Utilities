@@ -82,36 +82,6 @@ public struct DropdownMenu: View {
     }
 }
 
-//// Menu does not support Text Attributes in dropdown
-//public struct DropdownMenuAttributedText: View {
-//	public init(placeHolder: String = "Unselected", selection: Binding<Int>, options: [AttributedString]) {
-//		self.placeHolder = placeHolder
-//		self._selection = selection
-//		self.options = options
-//		self.optionImages = options.map { option in
-//			Image(uiImage: Text(option).foregroundStyle(.black).snapshot())}
-//	}
-//	
-//	// Menu does not support Text Attributes in dropdown
-//	var placeHolder = "Unselected"
-//	@Binding var selection: Int
-//	@State var showMenu = false
-//	let options: [AttributedString]
-//	let optionImages: [Image]
-//	public var body: some View {
-//		Menu {
-//			ForEach(options.indices, id:\.self) { i in
-//				Button { selection = i } label: {
-//					Text(options[i])}
-//			}
-//		} label: {
-//			(options.indices.contains(selection)
-//			 ? Text(options[selection])
-//			 : Text(placeHolder).foregroundColor(.gray))
-//		}.menuStyle(DropdownMenuStyle())//.buttonStyle(.plain)
-//	}
-//}
-
 // extension View {
 //	func snapshot() -> UIImage {
 //		let controller = UIHostingController(rootView: self.edgesIgnoringSafeArea(.all))
@@ -152,7 +122,8 @@ struct MenuList : View {
 // A placeHolder is used for selections that are out of range in option can be set
 public struct DropdownPopover: View {
 
-    public init(placeHolder: AttributedString = HTMLParser("<gray>Unselected</gray>").attributedString, selection: Binding<Int>, options: [AttributedString]) {
+    public init(placeHolder: AttributedString = HTMLParser("<gray>Unselected</gray>").attributedString,
+				selection: Binding<Int>, options: [AttributedString]) {
         self.placeHolder = placeHolder
         self._selection = selection
         self.options = options
@@ -233,9 +204,6 @@ public struct Dropdown: View {
 						dismiss?()
 					} label: {
 						Text(options[i]).horizontalFill(minLength: 10)
-							//.frame(maxWidth: .infinity, alignment: .leading)
-							//.padding(.horizontal, 12)
-							//.padding(.vertical, 6)
 					}
 					.buttonStyle(MenuItemButtonStyle())
 					if i < options.indices.last! {
@@ -316,15 +284,7 @@ struct Preview2: View {
 						VStack(spacing: 8) {
 							Text("Smart Dropdown (top of screen):")
 								.font(.headline)
-							Dropdown(selection: $selection, options: options1
-									 //							Dropdown(
-									 //								options: createAttributedOptions(),
-									 //								selectedOption: selectedText1,
-									 //								onSelectionChanged: { newSelection in
-									 //									selectedText1 = newSelection
-									 //								}//,
-									 //dropdown: $dropdown
-							)
+							Dropdown(selection: $selection, options: options1)
 							.frame(maxWidth: 250)
 						}
 						

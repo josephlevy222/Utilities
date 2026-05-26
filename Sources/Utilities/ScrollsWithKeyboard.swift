@@ -1,10 +1,10 @@
 //
-//  KeyboardAwareScroll.swift
+//  ScrollWithKeyboard.swift
 //  KeyboardAwareScrolling
 //
-//  Created by Joseph Levy on 5/11/26. Copilot Assisted
+//  Created by Joseph Levy on 5/11/26.
 //
-#if true // Use this code
+
 import SwiftUI
 
 // MARK: - Environment key for focus notification
@@ -28,12 +28,14 @@ public struct NamedFocusModifier<ID: Hashable>: ViewModifier {
 	@Environment(\.notifyFocused) private var notifyFocused
 	
 	public func body(content: Content) -> some View {
-		content
-			.focused($focusedField, equals: id)
-			.id(id)
-			.onChange(of: focusedField == id) { isFocused in
-				if isFocused { notifyFocused?(AnyHashable(id)) }
-			}
+		if let notifyFocused { // if there is no notifyFocused callback do nothing
+			content
+				.focused($focusedField, equals: id)
+				.id(id)
+				.onChange(of: focusedField == id) { isFocused in
+					if isFocused { notifyFocused(AnyHashable(id)) }
+				}
+		} else { content }
 	}
 }
 
@@ -43,18 +45,20 @@ public struct AnonymousFocusModifier: ViewModifier {
 	@Environment(\.notifyFocused) private var notifyFocused
 	
 	public func body(content: Content) -> some View {
-		content
-			.focused($isFocused)
-			.id(id)
-			.onChange(of: isFocused) { focused in
-				if focused { notifyFocused?(AnyHashable(id)) }
-			}
+		if let notifyFocused {  // if there is no notifyFocused callback do nothing
+			content
+				.focused($isFocused)
+				.id(id)
+				.onChange(of: isFocused) { focused in
+					if focused { notifyFocused(AnyHashable(id)) }
+				}
+		} else { content }
 	}
 }
 
 public extension View {
 	@ViewBuilder
-	func scrollDisabledCompatable(_ disabled: Bool) -> some View { // scrolling always enabled on iOS 15
+	internal func scrollDisabledCompatible(_ disabled: Bool) -> some View { // scrolling always enabled on iOS 15
 		if #available(iOS 16, *) { self.scrollDisabled(disabled) } else { self }
 	}
 	func trackFocus<ID: Hashable>(_ id: ID, equals: FocusState<ID?>.Binding) -> some View {
@@ -94,9 +98,6 @@ public struct ScrollsWithKeyboard<Content: View>: View {
 					}
 			}
 			.ignoresSafeArea(.keyboard)
-//			Color.clear
-//				.ignoresSafeArea(.keyboard)
-//				.captureHeight(in: $baseHeight)
 			
 			ScrollViewReader { proxy in
 					ScrollView {
@@ -107,9 +108,9 @@ public struct ScrollsWithKeyboard<Content: View>: View {
 					/// Fields call notifyFocused via onChange(of: isFocused) —  only the field that GAINS focus fires, the one losing focus does not.
 					.environment(\.notifyFocused) { id in
 						activeFocusId = id
-						scrollTrigger = UUID()  /// always a new value → onChange always fires
+						scrollTrigger = UUID()  // always a new value → onChange always fires
 					}
-					.onChange(of: scrollTrigger) { _ in
+					.onChange(of: scrollTrigger) { _ in 
 						guard let id = activeFocusId else { return }
 						withAnimation(animation) { proxy.scrollTo(id) }
 					}
@@ -119,7 +120,7 @@ public struct ScrollsWithKeyboard<Content: View>: View {
 					.onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) {
 						handleKeyboard($0, isShowing: false)
 					}
-					.scrollDisabledCompatable(keyboardHeight == 0)
+					.scrollDisabledCompatible(keyboardHeight == 0)
 				
 			}
 		}
@@ -149,4 +150,3 @@ public struct ScrollsWithKeyboard<Content: View>: View {
 		}
 	}
 }
-#endif
