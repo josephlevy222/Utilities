@@ -67,8 +67,8 @@ public extension View {
 	func trackFocus() -> some View {
 		self.modifier(AnonymousFocusModifier())
 	}
-	func scrollsWithKeyboard() -> some View {
-		ScrollsWithKeyboard { self }
+	func scrollsWithKeyboard(alwaysAllowScroll: Bool = false) -> some View {
+		ScrollsWithKeyboard(alwaysAllowScroll: alwaysAllowScroll) { self }
 	}
 }
 
@@ -77,6 +77,7 @@ public extension View {
 public struct ScrollsWithKeyboard<Content: View>: View {
 	@ViewBuilder let content: () -> Content
 	
+	@State private var alwaysAllowScroll: Bool = false
 	@State private var baseHeight:     CGFloat   = 0
 	@State private var keyboardHeight: CGFloat   = 0
 	@State private var activeFocusId:  AnyHashable?   // persists for keyboard re-triggers
@@ -120,7 +121,7 @@ public struct ScrollsWithKeyboard<Content: View>: View {
 					.onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) {
 						handleKeyboard($0, isShowing: false)
 					}
-					.scrollDisabledCompatible(keyboardHeight == 0)
+					.scrollDisabledCompatible(!alwaysAllowScroll && keyboardHeight == 0)
 				
 			}
 		}
