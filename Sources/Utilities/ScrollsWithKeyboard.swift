@@ -77,7 +77,12 @@ public extension View {
 public struct ScrollsWithKeyboard<Content: View>: View {
 	@ViewBuilder let content: () -> Content
 	
-	public let alwaysAllowScroll: Bool = false
+	init(alwaysAllowScroll: Bool = false, content: @escaping () -> Content) {
+		self.alwaysAllowScroll = alwaysAllowScroll
+		self.content =  content
+	}
+	
+	public let alwaysAllowScroll: Bool
 	@State private var baseHeight:     CGFloat   = 0
 	@State private var keyboardHeight: CGFloat   = 0
 	@State private var activeFocusId:  AnyHashable?   // persists for keyboard re-triggers
